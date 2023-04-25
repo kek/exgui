@@ -3,7 +3,13 @@ defmodule ExguiTest do
   doctest Exgui
 
   test "greets the world" do
-    assert Exgui.hello() == :world
+    result = Exgui.hello(self())
+    IO.puts("Hello returned #{inspect(result)}")
+    assert result == {}
+
+    receive do
+      x -> IO.puts("Received #{inspect(x)}")
+    end
   end
 
   test "adding by Rustler NIF" do
