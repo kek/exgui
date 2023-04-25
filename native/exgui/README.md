@@ -18,3 +18,8 @@ end
 ## Examples
 
 [This](https://github.com/rusterlium/NifIo) is a complete example of a NIF written in Rust.
+
+## References
+
+- https://www.erlang.org/doc/man/erl_nif.html "Long-running NIFs"
+- https://docs.rs/rustler/latest/rustler/
