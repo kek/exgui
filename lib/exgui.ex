@@ -16,4 +16,6 @@ defmodule Exgui do
   def make_channel(_debug_pid), do: :erlang.nif_error(:nif_not_loaded)
 
   def send_on_channel(_channel, _integer), do: :erlang.nif_error(:nif_not_loaded)
+
+  def gui(), do: :erlang.nif_error(:nif_not_loaded)
 end
