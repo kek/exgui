@@ -1,28 +1,26 @@
-use rustler::{Encoder, Env, Term};
-use std::sync::RwLock;
+use rustler::{
+    init, nif, Encoder, Env, JobSpawner, LocalPid, OwnedEnv, ResourceArc, Term, ThreadSpawner,
+};
+use std::sync::{mpsc, Mutex, RwLock};
 
-#[rustler::nif]
+#[nif]
 fn add(a: i64, b: i64) -> i64 {
     a + b
 }
 
-#[rustler::nif]
+#[nif]
 #[allow(unused_variables)]
-fn hello(pid: rustler::types::LocalPid) -> () {
-    std::thread::spawn(|| {
-        println!("Hello from thread!");
-    });
-    <rustler::thread::ThreadSpawner as rustler::thread::JobSpawner>::spawn(move || {
-        println!("Hello from job!");
-        let mut msg_env = rustler::OwnedEnv::new();
+fn spawn_external_process(debug_pid: LocalPid) -> () {
+    <ThreadSpawner as JobSpawner>::spawn(move || {
+        let mut msg_env = OwnedEnv::new();
         let data = "Hello world";
-        msg_env.send_and_clear(&pid, |env| data.encode(env));
+        msg_env.send_and_clear(&debug_pid, |env| data.encode(env));
     });
 }
 
 fn load(env: Env, _term: Term) -> bool {
     rustler::resource!(TestResource, env);
-
+    rustler::resource!(ChannelResource, env);
     true
 }
 
@@ -31,20 +29,53 @@ pub struct TestResource {
     test_field: RwLock<i32>,
 }
 
-#[rustler::nif]
-fn make_resource() -> rustler::resource::ResourceArc<TestResource> {
-    rustler::resource::ResourceArc::new(TestResource {
+#[nif]
+fn make_resource() -> ResourceArc<TestResource> {
+    ResourceArc::new(TestResource {
         test_field: RwLock::new(42),
     })
 }
 
-#[rustler::nif]
-fn read_resource(resource: rustler::resource::ResourceArc<TestResource>) -> i32 {
+#[allow(dead_code)]
+pub struct ChannelResource {
+    test_field: RwLock<Mutex<mpsc::Sender<i32>>>,
+}
+
+#[nif]
+fn make_channel(debug_pid: LocalPid) -> ResourceArc<ChannelResource> {
+    let (tx, rx) = mpsc::channel::<i32>();
+
+    <ThreadSpawner as JobSpawner>::spawn(move || {
+        let some_number = rx.recv().unwrap();
+        let mut msg_env = OwnedEnv::new();
+        msg_env.send_and_clear(&debug_pid, |env| some_number.encode(env));
+    });
+
+    ResourceArc::new(ChannelResource {
+        test_field: RwLock::new(tx.clone().into()),
+    })
+}
+
+#[nif]
+fn send_on_channel(channel: ResourceArc<ChannelResource>, i: i32) -> () {
+    let tx = channel.test_field.read().unwrap();
+    tx.lock().unwrap().send(i).unwrap();
+}
+
+#[nif]
+fn read_resource(resource: ResourceArc<TestResource>) -> i32 {
     *resource.test_field.read().unwrap()
 }
 
-rustler::init!(
+init!(
     "Elixir.Exgui",
-    [add, hello, make_resource, read_resource],
+    [
+        add,
+        spawn_external_process,
+        make_resource,
+        read_resource,
+        make_channel,
+        send_on_channel
+    ],
     load = load
 );

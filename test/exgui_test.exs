@@ -7,17 +7,20 @@ defmodule ExguiTest do
   end
 
   test "greets the world" do
-    result = Exgui.hello(self())
-    IO.puts("Hello returned #{inspect(result)}")
+    result = Exgui.spawn_external_process(self())
     assert result == {}
 
-    receive do
-      x -> IO.puts("Received #{inspect(x)}")
-    end
+    assert_receive "Hello world"
   end
 
   test "use a resource" do
     resource = Exgui.make_resource()
     assert Exgui.read_resource(resource) == 42
+  end
+
+  test "use a channel" do
+    channel = Exgui.make_channel(self())
+    Exgui.send_on_channel(channel, 101)
+    assert_receive 101
   end
 end
