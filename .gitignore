@@ -26,3 +26,4 @@ exgui-*.tar
 /tmp/
 
 /priv/native/*.so
+/target
