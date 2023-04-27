@@ -10,7 +10,7 @@ fn add(a: i64, b: i64) -> i64 {
 
 #[nif]
 #[allow(unused_variables)]
-fn spawn_external_process(debug_pid: LocalPid) -> () {
+fn spawn_thread(debug_pid: LocalPid) -> () {
     <ThreadSpawner as JobSpawner>::spawn(move || {
         let mut msg_env = OwnedEnv::new();
         let data = "Hello world";
@@ -71,7 +71,7 @@ init!(
     "Elixir.Editor",
     [
         add,
-        spawn_external_process,
+        spawn_thread,
         make_resource,
         read_resource,
         make_channel,

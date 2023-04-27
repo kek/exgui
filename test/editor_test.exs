@@ -7,7 +7,7 @@ defmodule EditorTest do
   end
 
   test "greets the world" do
-    result = Editor.spawn_external_process(self())
+    result = Editor.spawn_thread(self())
     assert result == {}
 
     assert_receive "Hello world"
