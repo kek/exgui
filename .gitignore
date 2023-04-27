@@ -26,4 +26,5 @@ editor-*.tar
 /tmp/
 
 /priv/native/*.so
+/priv/native/editor
 /target
