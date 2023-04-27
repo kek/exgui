@@ -38,7 +38,7 @@ fn make_resource() -> ResourceArc<TestResource> {
 
 #[allow(dead_code)]
 pub struct ChannelResource {
-    test_field: RwLock<Mutex<mpsc::Sender<i32>>>,
+    test_field: Mutex<mpsc::Sender<i32>>,
 }
 
 #[nif]
@@ -52,14 +52,14 @@ fn make_channel(debug_pid: LocalPid) -> ResourceArc<ChannelResource> {
     });
 
     ResourceArc::new(ChannelResource {
-        test_field: RwLock::new(tx.clone().into()),
+        test_field: tx.into(),
     })
 }
 
 #[nif]
 fn send_on_channel(channel: ResourceArc<ChannelResource>, i: i32) -> () {
-    let tx = channel.test_field.read().unwrap();
-    tx.lock().unwrap().send(i).unwrap();
+    let tx = channel.test_field.lock().unwrap();
+    tx.send(i).unwrap();
 }
 
 #[nif]
