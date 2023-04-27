@@ -7,7 +7,7 @@ version = "0.1.0"
 [lib]
 crate-type = ["cdylib"]
 name = "editor"
-path = "src/lib.rs"
+path = "src/nifs.rs"
 
 [dependencies]
 rustler = "0.27.0"
