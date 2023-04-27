@@ -1,12 +1,12 @@
 [package]
 authors = []
 edition = "2021"
-name = "exgui"
+name = "editor"
 version = "0.1.0"
 
 [lib]
 crate-type = ["cdylib"]
-name = "exgui"
+name = "editor"
 path = "src/lib.rs"
 
 [dependencies]

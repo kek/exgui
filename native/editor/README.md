@@ -1,4 +1,4 @@
-# NIF for Elixir.Exgui
+# NIF for Elixir.Editor
 
 ## To build the NIF module:
 
@@ -7,8 +7,8 @@
 ## To load the NIF:
 
 ```elixir
-defmodule Exgui do
-  use Rustler, otp_app: :exgui, crate: "exgui"
+defmodule Editor do
+  use Rustler, otp_app: :editor, crate: "editor"
 
   # When your NIF is loaded, it will override this function.
   def add(_a, _b), do: :erlang.nif_error(:nif_not_loaded)

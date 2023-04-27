@@ -68,7 +68,7 @@ fn read_resource(resource: ResourceArc<TestResource>) -> i32 {
 }
 
 init!(
-    "Elixir.Exgui",
+    "Elixir.Editor",
     [
         add,
         spawn_external_process,

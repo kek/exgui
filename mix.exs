@@ -1,9 +1,9 @@
-defmodule Exgui.MixProject do
+defmodule Editor.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :exgui,
+      app: :editor,
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
